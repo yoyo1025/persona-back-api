@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  persona_app:
+    container_name: ${APP_CONTAINER_NAME}
+    build:
+      context: .
+      dockerfile: ./build/dockerfiles/app/Dockerfile
+    depends_on:
+      - persona_db
+    ports:
+      - "${APP_PORT}:4000"
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_DATABASE=${DB_DATABASE}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+  persona_db:
+    container_name: ${DB_HOST}
+    build:
+      context: .
+      dockerfile: ./build/dockerfiles/db/Dockerfile
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - db-store:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "${DB_PORT_HOST}:5432"  # ホスト側の別ポートにマッピング
+    expose:
+      - "5432"
+
+volumes:
+  db-store:
+

@@ -1,7 +1,7 @@
 FROM golang:1.19.1-alpine
 
 # 必要なパッケージをインストール
-RUN apk update && apk add --no-cache git
+RUN apk update && apk add --no-cache git bash
 
 # 作業ディレクトリを設定
 WORKDIR /app
@@ -18,8 +18,11 @@ COPY . .
 # アプリケーションをビルド
 RUN go build -o main .
 
+# wait-for-it.shをコピーして、Postgresの起動を待機できるようにする
+COPY wait-for-it.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/wait-for-it.sh
+
 # ポートを公開
 EXPOSE 4000
 
-# コンテナ起動時に実行するコマンドを設定
-CMD ["./main"]
+CMD ["wait-for-it.sh", "persona_db:5432", "--", "./main"]
