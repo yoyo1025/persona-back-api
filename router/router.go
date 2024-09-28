@@ -11,7 +11,7 @@ import (
 func NewRouter(openaiClient *openai.Client) http.Handler {
     mux := http.NewServeMux()
 		mux.HandleFunc("/test", testHandler)
-		
+		mux.HandleFunc("/register", datebase.InputPersona)
     // ミドルウェアの適用
     return middleware.CORS(mux)
 }
