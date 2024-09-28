@@ -60,7 +60,6 @@ func InputPersona(w http.ResponseWriter, r *http.Request){
 			return
 	}
 	fmt.Println("データベースの挿入に成功しました")
-
-
+	fmt.Fprintln(w, "登録が完了しました！")
 }
 
