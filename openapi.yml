@@ -1,0 +1,245 @@
+openapi: 3.0.0
+info:
+  title: Persona API
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /{userID}:
+    get:
+      summary: Get persona archives for a user
+      parameters:
+        - name: userID
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the user
+      responses:
+        '200':
+          description: Successful retrieval of persona archives
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Archive'
+        '400':
+          description: Invalid user ID format
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+
+  /register:
+    post:
+      summary: Register a new persona
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Persona'
+      responses:
+        '200':
+          description: Persona registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResponse'
+        '400':
+          description: Missing or invalid fields
+        '500':
+          description: Internal server error
+
+  /conversation/{personaID}:
+    get:
+      summary: Get all comments for a persona
+      parameters:
+        - name: personaID
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the persona
+      responses:
+        '200':
+          description: Successful retrieval of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Comment'
+        '400':
+          description: Invalid persona ID format
+        '404':
+          description: Persona not found
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Post a comment to a persona
+      parameters:
+        - name: personaID
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the persona
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostCommentRequest'
+      responses:
+        '200':
+          description: Comment posted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostCommentResponse'
+        '400':
+          description: Missing or invalid fields
+        '500':
+          description: Internal server error
+
+  /document:
+    post:
+      summary: Generate a document using OpenAI
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Document generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: Invalid request data
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    Archive:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID of the persona
+        user_id:
+          type: integer
+          description: ID of the user
+        name:
+          type: string
+          description: Name of the persona
+        problems:
+          type: string
+          description: Problems associated with the persona
+      required:
+        - id
+        - user_id
+        - name
+        - problems
+
+    Persona:
+      type: object
+      properties:
+        name:
+          type: string
+        sex:
+          type: string
+        age:
+          type: integer
+        profession:
+          type: string
+        problems:
+          type: string
+        behavior:
+          type: string
+      required:
+        - name
+        - sex
+        - age
+        - profession
+
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        id:
+          type: integer
+        name:
+          type: string
+        user_id:
+          type: integer
+        age:
+          type: string
+        profession:
+          type: string
+        problems:
+          type: string
+        behavior:
+          type: string
+        ai_comment:
+          type: string
+      required:
+        - message
+        - id
+        - name
+        - user_id
+        - age
+        - profession
+        - problems
+        - behavior
+        - ai_comment
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        user_id:
+          type: integer
+        persona_id:
+          type: integer
+        comment:
+          type: string
+        is_user_comment:
+          type: boolean
+        good:
+          type: boolean
+      required:
+        - id
+        - user_id
+        - persona_id
+        - comment
+        - is_user_comment
+        - good
+
+    PostCommentRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+      required:
+        - comment
+
+    PostCommentResponse:
+      type: object
+      properties:
+        comment:
+          type: string
+      required:
+        - comment
