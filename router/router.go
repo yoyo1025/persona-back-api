@@ -3,7 +3,7 @@ package router
 import (
 	"fmt"
 	"net/http"
-
+	"github.com/yoyo1025/persona-back-api/database"
 	"github.com/sashabaranov/go-openai"
 	"github.com/yoyo1025/persona-back-api/middleware"
 )
@@ -11,7 +11,7 @@ import (
 func NewRouter(openaiClient *openai.Client) http.Handler {
     mux := http.NewServeMux()
 		mux.HandleFunc("/test", testHandler)
-		
+		mux.HandleFunc("/", database.UseridHandler)
     // ミドルウェアの適用
     return middleware.CORS(mux)
 }
