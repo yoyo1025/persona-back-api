@@ -6,6 +6,7 @@ import (
 "fmt"
 "net/http"
 "encoding/json"
+"github.com/yoyo1025/persona-back-api/model"
 ) 
 
 
@@ -68,17 +69,7 @@ if err != nil {
 
 
 
-type Persona struct{
-	Name string `json:"name"`
-	user_id int64 `"json:user_id"`
-	Sex	string `"json:sex"`
-	Age	int64 `"json:age"`
-	Profession string `"json:profession"`
-	Problems string `"json:problems"`
-	Behavior string `"json:behavior"`
-	
 
-}
 
 //通信処理
 func InputPersona(w http.ResponseWriter, r *http.Request){
@@ -90,7 +81,7 @@ func InputPersona(w http.ResponseWriter, r *http.Request){
 	fmt.Println("InputPersonaが呼ばれました")
 	
 	//ペルソナ型の構造体を使用
-	var persona Persona
+	var persona model.Persona
 // リクエストボディからJSONデータをデコード
 	err := json.NewDecoder(r.Body).Decode(&persona)
 	if err != nil {
