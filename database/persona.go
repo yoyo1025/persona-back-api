@@ -27,7 +27,7 @@ type User struct {
 func UseridHandler(w http.ResponseWriter, r *http.Request){
 
 	if r.Method != http.MethodGet {
-		http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)
+		http.Error(w, "許可されていないメソッドで～す", http.StatusMethodNotAllowed)
 		return
 	}
 	// クエリ実行
@@ -62,6 +62,44 @@ func UseridHandler(w http.ResponseWriter, r *http.Request){
 if err != nil {
 	http.Error(w, "レスポンスのエンコードに失敗しました: "+err.Error(), http.StatusInternalServerError)
 	return
+}
+
+}
+
+
+type Answer struct{
+
+	Correctanswer string `json:"correctanswer"`
+}
+
+
+
+func PelsonaDelete(w http.ResponseWriter, r *http.Request){
+	if r.Method != http.MethodDelete {
+		http.Error(w, "許可されていないメソッドです", http.StatusMethodNotAllowed)
+		return
+	}
+
+	//クエリ実行
+	query := `DELETE FROM persona WHERE id = $1`
+	rows, err := db.Query(query, 1)
+	if err != nil {
+  	http.Error(w, "コメントの削除に失敗しました: "+err.Error(), http.StatusInternalServerError)
+  		return
+	}
+
+	defer rows.Close()
+
+a :=Answer{
+
+	Correctanswer:	"削除されました",
+}
+
+err = json.NewEncoder(w).Encode(a)
+if err != nil {
+	http.Error(w, "レスポンスのエンコードに失敗しました: "+err.Error(), http.StatusInternalServerError)
+	return
+
 }
 
 }
