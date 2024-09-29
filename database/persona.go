@@ -6,6 +6,8 @@ import (
 "fmt"
 "net/http"
 "encoding/json"
+"github.com/yoyo1025/persona-back-api/model"
+"github.com/yoyo1025/persona-back-api/util"
 ) 
 
 
@@ -106,17 +108,7 @@ if err != nil {
 
 
 
-type Persona struct{
-	Name string `json:"name"`
-	user_id int64 `"json:user_id"`
-	Sex	string `"json:sex"`
-	Age	int64 `"json:age"`
-	Profession string `"json:profession"`
-	Problems string `"json:problems"`
-	Behavior string `"json:behavior"`
-	
 
-}
 
 //通信処理
 func InputPersona(w http.ResponseWriter, r *http.Request){
@@ -128,7 +120,7 @@ func InputPersona(w http.ResponseWriter, r *http.Request){
 	fmt.Println("InputPersonaが呼ばれました")
 	
 	//ペルソナ型の構造体を使用
-	var persona Persona
+	var persona model.Persona
 // リクエストボディからJSONデータをデコード
 	err := json.NewDecoder(r.Body).Decode(&persona)
 	if err != nil {
@@ -140,8 +132,8 @@ func InputPersona(w http.ResponseWriter, r *http.Request){
 		http.Error(w, "必要なフィールドが不足しています", http.StatusBadRequest)
 		return
 	}
-
-		// データベースに挿入
+  
+		//ペルソナデータベースに挿入
 	query := `  INSERT INTO persona (name, user_id, sex, age, profession, problems, behavior) VALUES ($1, $2, $3, $4, $5, $6, $7) returning id`
 	var insertedID int
 	err = db.QueryRow(query, persona.Name, 1, persona.Sex, persona.Age, persona.Profession, persona.Problems, persona.Behavior).Scan(&insertedID)
@@ -149,6 +141,19 @@ func InputPersona(w http.ResponseWriter, r *http.Request){
 			http.Error(w, "データベースへの挿入に失敗しました: "+err.Error(), http.StatusInternalServerError)
 			return
 	}
+
+	//コメントをAIから取得
+	comment,err := util.CreatePersonaFirstComment(persona, openaiClient)
+	
+	//コメントをコメントDBに挿入
+	query2 := `  INSERT INTO comment (comment) VALUES ($1) returning id`
+	var insertedID2 int
+	err2 := db.QueryRow(query2, comment).Scan(&insertedID2)
+	if err2 != nil {
+			http.Error(w, "データベースへの挿入に失敗しました: "+err.Error(), http.StatusInternalServerError)
+			return
+	}
+
 	fmt.Println("データベースの挿入に成功しました")
 	fmt.Fprintln(w, "登録が完了しました！")
 }
